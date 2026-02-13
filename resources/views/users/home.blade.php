@@ -84,21 +84,6 @@
             margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .category-grid {
-                grid-template-columns: repeat(6, 1fr);
-            }
-
-            .category-grid .cat-box {
-                grid-column: span 2;
-            }
-
-            .category-grid .cat-box:nth-last-child(2),
-            .category-grid .cat-box:nth-last-child(1) {
-                grid-column: span 3;
-            }
-        }
-
         .cat-box {
             background: #ffffff;
             border-radius: 15px;
@@ -258,7 +243,7 @@
 
 
         <a href="menu.html" class="btn btn-view-menu">
-            View Full Menu
+            VIEW MORE
         </a>
 
     </div>

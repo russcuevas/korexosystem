@@ -14,6 +14,4 @@ class TicketingController extends Controller
         $tickets = Ticket::all();
         return view('admin.ticketing', compact('tickets'));
     }
-
-    
 }
