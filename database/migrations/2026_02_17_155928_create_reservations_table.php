@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->string('category_pic')->nullable();
-            $table->string('category_name')->unique();
-            $table->boolean('is_rice_menu')->default(false);
-            $table->boolean('is_add_ons_menu')->default(false);
+            $table->string('time_slot');
+            $table->integer('available_slots')->default(20);
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('reservations');
     }
 };

@@ -234,7 +234,7 @@
         <div class="category-grid">
             @foreach ($category as $categories)
                 <div class="cat-box">
-                    <img src="{{ asset('categories/' . $categories->category_pic) }}" 
+                    <img src="{{ asset('categories/' . $categories->category_pic) }}"
                         alt="{{ $categories->category_name }}">
                     <span>{{ $categories->category_name }}</span>
                 </div>
@@ -242,33 +242,13 @@
         </div>
 
 
-        <a href="menu.html" class="btn btn-view-menu">
+        <a href="{{ route('category.page') }}" class="btn btn-view-menu">
             VIEW MORE
         </a>
 
     </div>
 
-    <nav class="bottom-nav">
-        <a href="home.html" class="nav-link-custom active">
-            <i class="bi bi-house-door-fill"></i>
-            Home
-        </a>
-
-        <div class="float-cart-container">
-            <button class="float-cart-btn position-relative">
-                <i class="bi bi-bag-fill"></i>
-                <span
-                    class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-dark">
-                    0
-                </span>
-            </button>
-        </div>
-
-        <a href="menu.html" class="nav-link-custom">
-            <i class="bi bi-file-earmark-text-fill"></i>
-            Menu
-        </a>
-    </nav>
+    @include('users.bottom_navbar')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

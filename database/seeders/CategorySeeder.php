@@ -12,24 +12,32 @@ class CategorySeeder extends Seeder
         $categories = [
             [
                 'category_name' => 'Appetizers',
-                'category_pic' => 'https://cdn-icons-mp4.flaticon.com/512/13399/13399457.mp4'
+                'category_pic' => 'deviled-eggs.gif'
             ],
             [
                 'category_name' => 'Soup',
-                'category_pic' => 'https://cdn-icons-mp4.flaticon.com/512/12053/12053796.mp4'
+                'category_pic' => 'soup.gif'
             ],
             [
-                'category_name' => 'Mains',
-                'category_pic' => 'https://cdn-icons-mp4.flaticon.com/512/12053/12053796.mp4'
+                'category_name' => 'Main',
+                'category_pic' => 'healthy-meal.gif'
             ],
             [
                 'category_name' => 'Sides',
-                'category_pic' => 'http://cdn-icons-mp4.flaticon.com/512/15256/15256764.mp4'
+                'category_pic' => 'corn.gif'
             ],
             [
                 'category_name' => 'Dessert',
-                'category_pic' => 'https://cdn-icons-mp4.flaticon.com/512/11092/11092800.mp4'
+                'category_pic' => 'pancake.gif'
             ],
+            [
+                'category_name' => 'Rice',
+                'is_rice_menu' => true,
+            ],
+            [
+                'category_name' => 'Drinks',
+                'is_add_ons_menu' => true,
+            ]
         ];
 
         foreach ($categories as $category) {

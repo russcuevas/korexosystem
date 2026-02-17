@@ -14,7 +14,8 @@ class ReferenceNumberController extends Controller
     }
 
     #ROUTE: /check-ticket - POST METHOD
-    public function CheckTicket(Request $request){
+    public function CheckTicket(Request $request)
+    {
         $request->validate([
             'reference_number' => 'required',
         ]);
@@ -27,8 +28,14 @@ class ReferenceNumberController extends Controller
 
         if ($ticket->is_used == true) {
             return back()->with('error', 'Reference number has already been used.');
-        } 
+        }
 
-        return redirect()->route('home.page')->with('success', 'Welcome!');    
+        // Store verification in session
+        session([
+            'verified_reference' => true,
+            'reference_number' => $ticket->reference_number
+        ]);
+
+        return redirect()->route('home.page')->with('success', 'Welcome!');
     }
 }

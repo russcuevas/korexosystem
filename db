@@ -1,0 +1,39 @@
+<h2>Your Cart</h2>
+
+@if ($cartItems->isEmpty())
+<p>Your cart is empty.</p>
+@else
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Menu</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($cartItems as $item)
+        <tr>
+            <td class="d-flex align-items-center">
+                <!-- Main menu image -->
+                @if ($item->menu_pic ?? false)
+                <img src="{{ asset('menus/' . $item->menu_pic) }}" alt="{{ $item->menu_name }}"
+                    style="width:50px; height:50px; object-fit:cover; margin-right:10px; border-radius:5px;">
+                @endif
+                <div>
+                    <!-- Menu name and optional rice -->
+                    {{ $item->menu_name }}
+                    @if ($item->rice_name)
+                    x {{ $item->rice_name }}
+                    @endif
+                </div>
+            </td>
+            <td>{{ $item->quantity }}</td>
+            <td>₱{{ number_format($item->menu_price, 2) }}</td>
+            <td>₱{{ number_format($item->quantity * $item->menu_price, 2) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endif
