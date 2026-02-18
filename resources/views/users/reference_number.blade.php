@@ -105,7 +105,7 @@
             <div class="loader-ring"></div>
             <img src="{{ asset('logo.jpeg') }}" alt="Logo" class="loader-logo">
         </div>
-        <p class="loader-text">Loading KoREXO...</p>
+        <p class="loader-text">Loading Kōrexo!...</p>
     </div>
 
     <div class="container py-5">
@@ -113,7 +113,7 @@
             <div class="col-12 col-md-6">
                 <div class=" text-center">
                     <div class="logo-container mb-3"></div>
-                    <h4 class="fw-bold text-white mb-3">Welcome to KoREXO!</h4>
+                    <h4 class="fw-bold text-white mb-3">Welcome to Kōrexo!</h4>
                     <p class="small opacity-75 px-3">
                         Check your reference number located at the bottom of your ticket please fill out the form first
                         to proceed!

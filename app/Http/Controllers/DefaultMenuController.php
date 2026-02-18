@@ -29,14 +29,14 @@ class DefaultMenuController extends Controller
                 'menus.status',
                 'menus.is_rice_menu',
                 'menus.is_add_ons_menu',
-                'menus.category_id', // <-- ADD THIS LINE
-
+                'menus.category_id',
                 'categories.category_name'
             )
             ->where('menus.category_id', $category_id)
+            ->where('menus.status', 'Available') // ✅ FILTER STATUS
             ->get()
             ->map(function ($menu) {
-                // Assign required_addon based on menu_name
+
                 if (strpos($menu->menu_name, 'Salsa Strips') !== false) {
                     $menu->required_addon = 'Salsa Strips';
                 } elseif (strpos($menu->menu_name, 'Bulgogi Strips') !== false) {
@@ -44,6 +44,7 @@ class DefaultMenuController extends Controller
                 } else {
                     $menu->required_addon = null;
                 }
+
                 return $menu;
             });
 
@@ -63,9 +64,15 @@ class DefaultMenuController extends Controller
                 'updated_at'
             )
             ->where('is_rice_menu', 1)
+            ->where('status', 'Available') // ✅ FILTER STATUS
             ->get();
 
-
-        return view('users.menu', compact('menus', 'categories', 'category_id', 'currentCategory', 'riceMenus'));
+        return view('users.menu', compact(
+            'menus',
+            'categories',
+            'category_id',
+            'currentCategory',
+            'riceMenus'
+        ));
     }
 }

@@ -47,14 +47,15 @@
 
         .category-scroll-wrapper {
             display: flex;
-            flex-wrap: nowrap;
             overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
             gap: 12px;
             padding: 5px 15px 15px 15px;
             -webkit-overflow-scrolling: touch;
             cursor: grab;
-
         }
+
 
         .category-scroll-wrapper:active {
             cursor: grabbing;

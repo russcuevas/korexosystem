@@ -151,10 +151,101 @@
             color: white;
             border: none;
         }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
+                url("{{ asset('background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            z-index: 10;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .loader-ring {
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            border: 3px solid transparent;
+            border-top: 3px solid #a30000;
+            border-bottom: 3px solid #a30000;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .loader-text {
+            margin-top: 20px;
+            color: white;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(0.9);
+                opacity: 0.8;
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="preloader" style="display:none;">
+        <div class="loader-wrapper">
+            <div class="loader-ring"></div>
+            <img src="{{ asset('logo.jpeg') }}" alt="Logo" class="loader-logo">
+        </div>
+        <p class="loader-text">Processing your order...</p>
+    </div>
+
 
     <div class="container mt-2">
 
@@ -373,6 +464,25 @@
 
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const checkoutForm = document.querySelector('#reservationModal form');
+
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function() {
+
+                    // Show loader
+                    document.getElementById('preloader').style.display = "flex";
+
+                    // Disable all buttons
+                    const buttons = document.querySelectorAll('button');
+                    buttons.forEach(btn => btn.disabled = true);
+                });
+            }
+
+        });
+    </script>
 
 
 

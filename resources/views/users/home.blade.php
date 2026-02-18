@@ -194,8 +194,8 @@
         <div class="logo-container">
         </div>
         <p class="px-3 small">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
+            Kōrexo invites guests into a modern fine-dining experience where Korean discipline and Mexican fire coexist
+            in quiet sophistication - crafted for those who seek meaning beyond the plate
         </p>
     </div>
 
