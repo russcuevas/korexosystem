@@ -64,7 +64,11 @@ Route::middleware(['admin.auth'])->group(function () {
     Route::get('/admin/orders', [OrdersController::class, 'OrdersPage'])->name('admin.orders.page');
     Route::get('/admin/orders/search', [OrdersController::class, 'search'])->name('admin.orders.search');
     Route::get('/admin/orders/fetch', [OrdersController::class, 'fetchOrders'])->name('admin.orders.fetch');
+    Route::get('/admin/orders/items/{ref}', [OrdersController::class, 'getItems']);
+    Route::post('/admin/orders/item/serve', [OrdersController::class, 'serveItem']);
+    Route::post('/admin/orders/complete-all', [OrdersController::class, 'completeAll']);
     Route::post('/admin/orders/update-status', [OrdersController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::get('/admin/orders/receipt/{ref}', [OrdersController::class, 'printReceipt'])->name('admin.orders.receipt');
+
     Route::get('/qr-code/{referenceNumber}', [QrController::class, 'ShowQrOrder'])->name('admin.qr.show');
 });

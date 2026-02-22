@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('admins/css/ticketing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <style>
         /* Custom Dropdown Menu */
@@ -108,6 +109,29 @@
             width: 100%;
             margin-top: 10px;
         }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 8px;
+            transition: 0.2s ease;
+        }
+
+        .item-row.served {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+        }
+
+        .check-btn {
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 
@@ -123,36 +147,7 @@
             </div>
         </header>
 
-        <!-- Filters below header -->
         <div class="d-flex flex-wrap gap-2 mb-4 justify-content-end">
-            <!-- Sort Dropdown -->
-            <div class="dropdown flex-grow-1 flex-sm-grow-0">
-                <button class="btn btn-filter dropdown-toggle d-flex align-items-center gap-2 w-100" type="button"
-                    id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-sort-down"></i> <span>Newest</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" aria-labelledby="sortDropdown">
-                    <li><a class="dropdown-item active" href="#" onclick="updateSortText('Newest')">Newest
-                            First</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="updateSortText('Oldest')">Oldest First</a></li>
-                </ul>
-            </div>
-
-            <!-- Status Dropdown -->
-            <div class="dropdown flex-grow-1 flex-sm-grow-0">
-                <button class="btn btn-filter dropdown-toggle d-flex align-items-center gap-2 w-100" type="button"
-                    id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-sort-down"></i> <span>All Status</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end" aria-labelledby="statusDropdown">
-                    <li><a class="dropdown-item active" href="#" onclick="updateStatusText('All Status')">All</a>
-                    </li>
-                    <li><a class="dropdown-item" href="#" onclick="updateStatusText('Placed order')">Placed
-                            order</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="updateStatusText('Pending')">Pending</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="updateStatusText('Served')">Served</a></li>
-                </ul>
-            </div>
             <div class="flex-grow-1 flex-sm-grow-0">
                 <input type="text" id="searchRef" class="form-control" placeholder="Search REF #"
                     style="height: 41px;">
@@ -180,8 +175,13 @@
 
                                     {{-- Display REF --}}
                                     <div class="order-header d-flex justify-content-between">
-                                        <span class="fw-bold small">REF #{{ $order['reference_number'] }}</span>
-
+                                        <span class="fw-bold small">
+                                            REF #{{ $order['reference_number'] }}
+                                            <br>
+                                            <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
+                                                {{ \Carbon\Carbon::parse($order['items']->first()->reserved_at)->format('h A') }}
+                                            </span>
+                                        </span>
                                         @php
                                             $dotClass = match ($statusKey) {
                                                 'Placed order' => 'dot-placed',
@@ -229,10 +229,11 @@
                                                 onclick="updateStatus(this, '{{ $order['reference_number'] }}')">ACCEPT
                                                 ORDER</button>
                                         @elseif($statusKey == 'Pending')
-                                            <button class="btn btn-warning btn-action fw-bold text-dark">SERVED</button>
+                                            <button class="btn btn-warning btn-action fw-bold text-dark"
+                                                onclick="openServeModal('{{ $order['reference_number'] }}')">
+                                                SERVED
+                                            </button>
                                         @else
-                                            <button
-                                                class="btn btn-outline-light btn-action border-secondary">RECEIPT</button>
                                         @endif
                                     </div>
 
@@ -244,13 +245,40 @@
             @endforeach
         </div>
 
+        <!-- Serve Order Modal -->
+        <div class="modal fade" id="serveModal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content bg-dark text-white rounded-4 border-0">
+
+                    <div class="modal-header border-bottom border-secondary">
+                        <h5 class="modal-title fw-bold">
+                            REF #<span id="modalRefNumber"></span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body" id="modalOrderItems">
+
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button class="btn btn-success w-100 fw-bold" id="completeOrderBtn">
+                            COMPLETE ALL
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
 
 
 
 
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         // ---------------- Search REF # ----------------
         let timeout = null;
@@ -422,6 +450,116 @@
                 await new Promise(r => setTimeout(r, 25));
             }
         }
+
+        let currentReference = null;
+
+        function openServeModal(referenceNumber) {
+            currentReference = referenceNumber;
+
+            fetch(`/admin/orders/items/${referenceNumber}`)
+                .then(res => res.json())
+                .then(order => {
+
+                    document.getElementById('modalRefNumber').textContent = referenceNumber;
+
+                    let html = '';
+
+                    order.items.forEach(item => {
+
+                        let servedClass = item.is_served == 1 ? 'served' : '';
+
+                        html += `
+                    <div class="item-row ${servedClass}" id="item-${item.id}">
+                        <div>
+                            ${item.quantity}x ${item.menu_name}
+                        </div>
+                        <button class="check-btn"
+                            onclick="markItemServed(${item.id})">
+                            ✔
+                        </button>
+                    </div>
+                `;
+                    });
+
+                    document.getElementById('modalOrderItems').innerHTML = html;
+
+                    let modal = new bootstrap.Modal(document.getElementById('serveModal'));
+                    modal.show();
+                });
+        }
+
+        function markItemServed(itemId) {
+
+            fetch('/admin/orders/item/serve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.success) {
+
+                        // highlight item
+                        document
+                            .getElementById(`item-${itemId}`)
+                            .classList.add('served');
+
+                        // if order completed
+                        if (data.completed) {
+                            toastr.success("Order Completed!", "Success");
+                            bootstrap.Modal.getInstance(
+                                document.getElementById('serveModal')
+                            ).hide();
+                            fetchOrdersRealtime();
+                        }
+                    }
+                });
+        }
+
+        document.getElementById('completeOrderBtn')
+            .addEventListener('click', function() {
+
+                if (!currentReference) return;
+
+                fetch('/admin/orders/complete-all', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            reference_number: currentReference
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (data.success) {
+
+                            // Highlight all items in modal
+                            document.querySelectorAll('.item-row')
+                                .forEach(row => row.classList.add('served'));
+
+                            toastr.success("Order Completed!", "Success");
+
+                            // Close modal after small delay
+                            setTimeout(() => {
+                                bootstrap.Modal.getInstance(
+                                    document.getElementById('serveModal')
+                                ).hide();
+
+                                fetchOrdersRealtime();
+                            }, 800);
+                        }
+                    });
+
+            });
 
         // ---------------- Sort Dropdown ----------------
         function updateSortText(text) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -207,5 +208,81 @@ class OrdersController extends Controller
         $output .= str_pad("Thank you for your order!", $lineWidth, " ", STR_PAD_BOTH) . "\n\n\n";
 
         return response($output)->header('Content-Type', 'text/plain');
+    }
+
+    public function getItems($ref)
+    {
+        $items = DB::table('orders')
+            ->select(
+                'orders.*',
+                'menus.menu_name as menu_name',
+                'rice.menu_name as rice_name'
+            )
+            ->join('menus', 'orders.menu_id', '=', 'menus.id')
+            ->leftJoin('menus as rice', 'orders.is_rice_menu', '=', 'rice.id')
+            ->where('orders.reference_number', $ref)
+            ->get();
+
+        if ($items->isEmpty()) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        return response()->json([
+            'reference_number' => $ref,
+            'items' => $items
+        ]);
+    }
+
+    public function serveItem(Request $request)
+    {
+        $itemId = $request->item_id;
+
+        // 1️⃣ Mark the clicked item as served
+        $item = DB::table('orders')->where('id', $itemId)->first();
+
+        if (!$item) {
+            return response()->json(['error' => 'Item not found'], 404);
+        }
+
+        DB::table('orders')
+            ->where('id', $itemId)
+            ->update(['is_served' => 1]);
+
+        $remaining = DB::table('orders')
+            ->where('reference_number', $item->reference_number)
+            ->where('is_served', 0)
+            ->count();
+
+        if ($remaining == 0) {
+            DB::table('orders')
+                ->where('reference_number', $item->reference_number)
+                ->update(['status' => 'Served']);
+
+            return response()->json([
+                'success' => true,
+                'completed' => true
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'completed' => false
+        ]);
+    }
+
+    public function completeAll(Request $request)
+    {
+        $ref = $request->reference_number;
+
+        $updated = DB::table('orders')
+            ->where('reference_number', $ref)
+            ->update([
+                'is_served' => 1,
+                'status' => 'Served'
+            ]);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 }

@@ -15,8 +15,13 @@
 
                         {{-- Display REF --}}
                         <div class="order-header d-flex justify-content-between">
-                            <span class="fw-bold small">REF #{{ $order['reference_number'] }}</span>
-
+                            <span class="fw-bold small">
+                                REF #{{ $order['reference_number'] }}
+                                <br>
+                                <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
+                                    {{ \Carbon\Carbon::parse($order['items']->first()->reserved_at)->format('h A') }}
+                                </span>
+                            </span>
                             @php
                                 $dotClass = match ($statusKey) {
                                     'Placed order' => 'dot-placed',
@@ -64,9 +69,11 @@
                                     onclick="updateStatus(this, '{{ $order['reference_number'] }}')">ACCEPT
                                     ORDER</button>
                             @elseif($statusKey == 'Pending')
-                                <button class="btn btn-warning btn-action fw-bold text-dark">SERVED</button>
+                                <button class="btn btn-warning btn-action fw-bold text-dark"
+                                    onclick="openServeModal('{{ $order['reference_number'] }}')">
+                                    SERVED
+                                </button>
                             @else
-                                <button class="btn btn-outline-light btn-action border-secondary">RECEIPT</button>
                             @endif
                         </div>
 
