@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\MenuController;
+use App\Http\Controllers\admin\OrdersController;
 use App\Http\Controllers\admin\QrController;
 use App\Http\Controllers\admin\TicketingController;
+use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\CartCountsController;
 use App\Http\Controllers\CartsController;
 use App\Http\Controllers\CategoryController;
@@ -24,10 +27,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-
-Route::get('/reference_number', [ReferenceNumberController::class, 'ReferenceNumberPage'])
-    ->name('reference.number.page')
-    ->middleware('redirect.if.verified');
+Route::get('/', function () {
+    return redirect()->route('reference.number.page');
+});
+Route::get('/reference_number', [ReferenceNumberController::class, 'ReferenceNumberPage'])->name('reference.number.page')->middleware('redirect.if.verified');
 Route::post('/check-ticket', [ReferenceNumberController::class, 'CheckTicket'])->name('check.ticket');
 
 
@@ -39,9 +42,29 @@ Route::delete('/cart/delete/{id}', [CartsController::class, 'DeleteCartItem'])->
 Route::get('/cart/count', [CartCountsController::class, 'FetchCartCountAjax'])->name('cart.count')->middleware('check.reference');;
 Route::get('/cart', [CartsController::class, 'CartPage'])->name('cart.page')->middleware('check.reference');;
 Route::post('/checkout', [CheckoutController::class, 'checkout'])->name('checkout')->middleware('check.reference');;
+Route::get('/purchase-success/{reference_number}', [CheckoutController::class, 'PurchaseSuccessPage'])->name('purchase.success');
 
-Route::get('/admin/menu', [MenuController::class, 'AdminMenuPage'])->name('admin.menu.page');
-Route::get('/admin/ticketing', [TicketingController::class, 'AdminTicketingPage'])->name('admin.ticketing.page');
 
-Route::get('/admin/qr-code/{referenceNumber}', [QrController::class, 'ShowQrOrder'])
-    ->name('admin.qr.show');
+Route::get('/admin/login', [AuthController::class, 'AdminLoginPage'])
+    ->name('admin.login.page');
+
+Route::post('/admin/login', [AuthController::class, 'AdminLogin'])
+    ->name('admin.login');
+
+Route::post('/admin/logout', [AuthController::class, 'Logout'])
+    ->name('admin.logout');
+
+
+
+
+Route::middleware(['admin.auth'])->group(function () {
+    Route::get('/admin/dashboard', [DashboardController::class, 'DashboardPage'])->name('admin.dashboard.page');
+    Route::get('/admin/menu', [MenuController::class, 'AdminMenuPage'])->name('admin.menu.page');
+    Route::get('/admin/ticketing', [TicketingController::class, 'AdminTicketingPage'])->name('admin.ticketing.page');
+    Route::get('/admin/orders', [OrdersController::class, 'OrdersPage'])->name('admin.orders.page');
+    Route::get('/admin/orders/search', [OrdersController::class, 'search'])->name('admin.orders.search');
+    Route::get('/admin/orders/fetch', [OrdersController::class, 'fetchOrders'])->name('admin.orders.fetch');
+    Route::post('/admin/orders/update-status', [OrdersController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::get('/admin/orders/receipt/{ref}', [OrdersController::class, 'printReceipt'])->name('admin.orders.receipt');
+    Route::get('/qr-code/{referenceNumber}', [QrController::class, 'ShowQrOrder'])->name('admin.qr.show');
+});

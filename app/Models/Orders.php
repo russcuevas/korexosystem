@@ -15,6 +15,7 @@ class Order extends Model
         'email',
         'is_rice_menu',
         'is_add_ons_menu',
+        'is_served',
         'quantity',
         'price',
         'status',

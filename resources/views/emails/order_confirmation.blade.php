@@ -67,12 +67,14 @@
 
 <body>
     <div class="container">
-        <h2>Order Confirmation - Korexo</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ $message->embed(public_path('kore.png')) }}" alt="Korexo Logo"
+                style="display: block; margin: 0 auto; max-width: 100px; height: auto; border-radius: 100px;">
+        </div>
+        <h2>Order Confirmation</h2>
 
         <p><strong>Reference Number:</strong> {{ $referenceNumber }}</p>
-        <p><strong>Reserved Time:</strong> {{ \Carbon\Carbon::parse($reservedAt)->format('g A') }}</p>
-
-        <hr>
+        <p><strong>Reserved Time:</strong> {{ \Carbon\Carbon::parse($reservedAt)->format('g A') }} - March 03, 2026</p>
 
         <h3>Order Details:</h3>
 
@@ -118,15 +120,20 @@
 
         <h3 class="section">Total Amount: ₱{{ number_format($totalAmount, 2) }}</h3>
         @if (!empty($qrFileName))
-            <div class="section" style="margin-bottom:20px;">
+            <div class="section" style="margin: 25px 0; text-align: center;">
 
                 <img src="{{ $message->embed(public_path('qr-codes/' . $qrFileName)) }}" alt="QR Code"
-                    style="width:150px; height:150px;">
+                    style="display:block; margin: 0 auto; width:150px; height:150px;">
 
-                <p style="font-size: 12px; color: #777;">Ref: {{ $referenceNumber }}</p>
+                <p style="font-size: 12px; color: #777; margin-top:10px;">
+                    Ref: {{ $referenceNumber }} <br>
+                    "Please present this qr at the venue"
+                </p>
+
             </div>
         @endif
-        <p>Thank you for ordering from <strong>Korexo</strong>! We look forward to serving you.</p>
+
+        <p>Thank you for ordering from <strong>Korexo</strong>!</p>
     </div>
 </body>
 

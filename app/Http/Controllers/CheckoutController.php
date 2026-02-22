@@ -190,6 +190,14 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            DB::table('tickets')
+                ->where('reference_number', $referenceNumber)
+                ->where('is_used', 0)
+                ->update([
+                    'is_used' => 1,
+                    'updated_at' => now(),
+                ]);
+
             // ------------------------------
             // GENERATE QR CODE
             // ------------------------------
@@ -227,8 +235,9 @@ class CheckoutController extends Controller
                 )
             );
 
-            return redirect()->route('cart.page')
-                ->with('success', 'Checkout successful!');
+            return redirect()->route('purchase.success', [
+                'reference_number' => $referenceNumber
+            ]);
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -236,5 +245,20 @@ class CheckoutController extends Controller
             return redirect()->route('cart.page')
                 ->with('error', 'Checkout failed: ' . $e->getMessage());
         }
+    }
+
+    public function PurchaseSuccessPage($reference_number)
+    {
+        $ticket = DB::table('tickets')
+            ->where('reference_number', $reference_number)
+            ->where('is_used', 1)
+            ->first();
+
+        if (!$ticket) {
+            return redirect()->route('home.page')
+                ->with('error', 'Invalid purchase reference.');
+        }
+
+        return view('users.purchase_success', compact('reference_number'));
     }
 }

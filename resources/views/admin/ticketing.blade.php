@@ -97,13 +97,6 @@
                 <div class="col-12 col-xl-11"
                     style="background-color: rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 1.5rem;">
 
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4 gap-3">
-                        <h4 class="fw-bold text-white mb-0"></h4>
-                        <button class="btn btn-primary px-4 shadow-sm" id="addTicketBtn" style="border-radius: 10px;">
-                            <i class="fas fa-plus me-1"></i> ADD TICKET
-                        </button>
-                    </div>
-
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6">
                             <div class="small-box shadow-sm"
@@ -135,7 +128,6 @@
                                     <th class="py-3">STATUS</th>
                                     <th class="py-3">CREATED AT</th>
                                     <th class="py-3">UPDATED AT</th>
-                                    <th class="py-3 text-center">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -157,16 +149,7 @@
                                         </td>
                                         <td class="text-white-50 small">{{ $ticket->updated_at->format('Y-m-d h:i A') }}
                                         </td>
-                                        <td class="text-center">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-warning mx-1">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger mx-1">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>

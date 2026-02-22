@@ -108,7 +108,6 @@
                                     <th class="py-3">PRICE</th>
                                     <th class="py-3">STATUS</th>
                                     <th class="py-3">STOCK</th>
-                                    <th class="py-3 text-center">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -155,14 +154,6 @@
 
                                                 {{ $menu->stock_number }} - {{ $menu->status }}
                                             </span>
-                                        </td>
-
-                                        <td class="text-center">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-warning mx-1">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                </button>
-                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

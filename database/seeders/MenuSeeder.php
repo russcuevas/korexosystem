@@ -19,7 +19,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Kimchi Chicken Quezadilla',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
                     <h6><i>2 servings</i></h6>
                     <ul>
@@ -41,7 +41,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Cajun Corn Elote',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
                     <h6><i>3 servings</i></h6>
                     <ul>
@@ -61,7 +61,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Tofu Stew',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
         <h6><i>10-15 Servings</i></h6>
         <ul>
@@ -85,7 +85,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Chicken Tortilla Soup',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
                     <h6><i>8 - 10 Servings</i></h6>
                     <ul>
@@ -116,7 +116,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Salsa Strips',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
         <h6><i>3 Servings</i></h6>
         <ul>
@@ -135,7 +135,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Bulgogi Strips',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
         <h6><i>3 Servings</i></h6>
         <ul>
@@ -158,7 +158,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Buttered Corn',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
         <h6><i>4–5 Servings</i></h6>
         <ul>
@@ -173,7 +173,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Potato Marble',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
             ],
 
             //dessert
@@ -182,7 +182,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Watermelon Bingsu with Cheesecake',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'ingredients' => '
         <h6><i>2–3 Servings (Bingsu)</i></h6>
         <ul>
@@ -213,7 +213,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Plain Rice',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'is_rice_menu' => true,
             ],
             [
@@ -221,7 +221,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Kimchi Fried Rice',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'is_rice_menu' => true,
                 'ingredients' => '
         <h6><i>3 Servings</i></h6>
@@ -243,7 +243,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Mexican Rice',
                 'menu_price' => 0.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'is_rice_menu' => true,
                 'ingredients' => '
         <h6><i>3 Servings</i></h6>
@@ -270,7 +270,7 @@ class MenuSeeder extends Seeder
                 'menu_pic' => null,
                 'menu_name' => 'Matcha Latte',
                 'menu_price' => 50.00,
-                'stock_number' => 85,
+                'stock_number' => 250,
                 'is_add_ons_menu' => true,
             ],
         ];

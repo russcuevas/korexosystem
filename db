@@ -1,39 +1,59 @@
-<h2>Your Cart</h2>
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:CIctvhdIKqmymVAb27V3cHZzewPjPLAzl+WYjh973DM=
+APP_DEBUG=true
+APP_URL=http://localhost
 
-@if ($cartItems->isEmpty())
-<p>Your cart is empty.</p>
-@else
-<table class="table align-middle">
-    <thead>
-        <tr>
-            <th>Menu</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($cartItems as $item)
-        <tr>
-            <td class="d-flex align-items-center">
-                <!-- Main menu image -->
-                @if ($item->menu_pic ?? false)
-                <img src="{{ asset('menus/' . $item->menu_pic) }}" alt="{{ $item->menu_name }}"
-                    style="width:50px; height:50px; object-fit:cover; margin-right:10px; border-radius:5px;">
-                @endif
-                <div>
-                    <!-- Menu name and optional rice -->
-                    {{ $item->menu_name }}
-                    @if ($item->rice_name)
-                    x {{ $item->rice_name }}
-                    @endif
-                </div>
-            </td>
-            <td>{{ $item->quantity }}</td>
-            <td>₱{{ number_format($item->menu_price, 2) }}</td>
-            <td>₱{{ number_format($item->quantity * $item->menu_price, 2) }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-@endif
+LOG_CHANNEL=stack
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=u704635452_korexov2db
+DB_USERNAME=u704635452_korexov2db
+DB_PASSWORD=Korexo123!
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=ibayanmataasnakahoy2025@gmail.com
+MAIL_PASSWORD=telpdsndlbntyjty
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=ibayanmataasnakahoy2025@gmail.com
+MAIL_FROM_NAME="Korexo"
+
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_HOST=
+PUSHER_PORT=443
+PUSHER_SCHEME=https
+PUSHER_APP_CLUSTER=mt1
+
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_HOST="${PUSHER_HOST}"
+VITE_PUSHER_PORT="${PUSHER_PORT}"
+VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"

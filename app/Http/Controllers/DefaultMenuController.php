@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,6 +10,29 @@ class DefaultMenuController extends Controller
 {
     public function DefaultMenuPage($category_id)
     {
+        if (!session()->has('reference_number')) {
+            return redirect()->route('reference.number.page');
+        }
+
+        $referenceNumber = session('reference_number');
+
+        $ticket = Ticket::where('reference_number', $referenceNumber)->first();
+
+        // If ticket not found
+        if (!$ticket) {
+            session()->forget(['verified_reference', 'reference_number']);
+            return redirect()->route('reference.number.page')
+                ->with('error', 'Invalid reference number.');
+        }
+
+        // 🚨 If ticket already used
+        if ($ticket->is_used == 1) {
+            session()->forget(['verified_reference', 'reference_number']);
+
+            return redirect()->route('reference.number.page')
+                ->with('error', 'Reference number already used.');
+        }
+
         $categories = DB::table('categories')
             ->where('is_rice_menu', 0)
             ->get();

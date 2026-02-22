@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Carts;
 use App\Models\Reservation;
+use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 
 class CartsController extends Controller
@@ -53,6 +54,29 @@ class CartsController extends Controller
 
     public function CartPage()
     {
+        if (!session()->has('reference_number')) {
+            return redirect()->route('reference.number.page');
+        }
+
+        $referenceNumber = session('reference_number');
+
+        $ticket = Ticket::where('reference_number', $referenceNumber)->first();
+
+        // If ticket not found
+        if (!$ticket) {
+            session()->forget(['verified_reference', 'reference_number']);
+            return redirect()->route('reference.number.page')
+                ->with('error', 'Invalid reference number.');
+        }
+
+        // 🚨 If ticket already used
+        if ($ticket->is_used == 1) {
+            session()->forget(['verified_reference', 'reference_number']);
+
+            return redirect()->route('reference.number.page')
+                ->with('error', 'Reference number already used.');
+        }
+
         $referenceNumber = session('reference_number');
 
         if (!$referenceNumber) {
