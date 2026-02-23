@@ -18,11 +18,13 @@ class CheckoutController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
+            'fullname' => 'required|string|max:255',
             'email' => 'required|email',
             'reservation_id' => 'required|exists:reservations,id'
         ]);
 
         $email = $request->email;
+        $fullname = $request->fullname;
         $reservationId = $request->reservation_id;
         $referenceNumber = session('reference_number');
 
@@ -120,6 +122,7 @@ class CheckoutController extends Controller
                 DB::table('orders')->insert([
                     'reference_number' => $item->reference_number,
                     'email'            => $email,
+                    'fullname'         => $fullname,
                     'menu_id'          => $item->menu_id,
                     'is_rice_menu'     => $item->is_rice_menu,
                     'is_add_ons_menu'  => $item->is_add_ons_menu,
@@ -231,7 +234,8 @@ class CheckoutController extends Controller
                     $reservedDateTime,
                     $referenceNumber,
                     $totalAmount,
-                    $qrFileName
+                    $qrFileName,
+                    $fullname
                 )
             );
 

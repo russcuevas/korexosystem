@@ -156,21 +156,6 @@ class MenuSeeder extends Seeder
             [
                 'category_id' => 4,
                 'menu_pic' => null,
-                'menu_name' => 'Buttered Corn',
-                'menu_price' => 0.00,
-                'stock_number' => 250,
-                'ingredients' => '
-        <h6><i>4–5 Servings</i></h6>
-        <ul>
-            <li>Kernel Corn - 1 can</li>
-            <li>Butter - ¼ cup</li>
-        </ul>
-    ',
-            ],
-
-            [
-                'category_id' => 4,
-                'menu_pic' => null,
                 'menu_name' => 'Potato Marble',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -268,8 +253,33 @@ class MenuSeeder extends Seeder
             [
                 'category_id' => 7,
                 'menu_pic' => null,
-                'menu_name' => 'Matcha Latte',
-                'menu_price' => 50.00,
+                'menu_name' => 'Koretea [Juice]',
+                'menu_price' => 0.00,
+                'stock_number' => 250,
+                'is_add_ons_menu' => true,
+            ],
+
+            [
+                'category_id' => 7,
+                'menu_pic' => null,
+                'menu_name' => 'Spanish Latte',
+                'menu_price' => 100.00,
+                'stock_number' => 250,
+                'is_add_ons_menu' => true,
+            ],
+            [
+                'category_id' => 7,
+                'menu_pic' => null,
+                'menu_name' => 'Americano',
+                'menu_price' => 100.00,
+                'stock_number' => 250,
+                'is_add_ons_menu' => true,
+            ],
+            [
+                'category_id' => 7,
+                'menu_pic' => null,
+                'menu_name' => 'Cappucino',
+                'menu_price' => 100.00,
                 'stock_number' => 250,
                 'is_add_ons_menu' => true,
             ],

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('menu_id');
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
             $table->string('email')->nullable();
+            $table->string('fullname')->nullable();
             $table->unsignedBigInteger('is_rice_menu')->nullable();
             $table->foreign('is_rice_menu')->references('id')->on('menus')->onDelete('set null');
             $table->unsignedBigInteger('is_add_ons_menu')->nullable();

@@ -234,6 +234,17 @@
             }
         }
     </style>
+    <style>
+        #email::placeholder {
+            color: gray;
+            opacity: 1;
+        }
+
+        #fullname::placeholder {
+            color: gray;
+            opacity: 1;
+        }
+    </style>
 </head>
 
 <body>
@@ -391,9 +402,15 @@
 
                             <div class="modal-body">
                                 <div class="mb-3">
+                                    <label for="form-label">Fullname</label>
+                                    <input type="text" class="form-control" id="fullname" name="fullname"
+                                        placeholder="e.g Manalo John" required
+                                        style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; color: white;">
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Email</label>
                                     <input type="text" class="form-control" id="email" name="email"
-                                        placeholder="" required
+                                        placeholder="e.g Russel Vincent Cuevas" required
                                         style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 10px; color: white;">
                                 </div>
 

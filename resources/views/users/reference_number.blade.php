@@ -115,7 +115,8 @@
                     <div class="logo-container mb-3"></div>
                     <h4 class="fw-bold text-white mb-3">Welcome to Kōrexo!</h4>
                     <p class="small opacity-75 px-3">
-                        Check your reference number located at the bottom of your ticket please fill out the form first
+                        Check your reference number located at the bottom of your ticket. <br> please fill out the form
+                        first
                         to proceed!
                     </p>
                     <form action="{{ route('check.ticket') }}" method="POST" class="text-start mt-4 needs-validation"

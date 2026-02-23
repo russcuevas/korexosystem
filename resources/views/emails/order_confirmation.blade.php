@@ -72,7 +72,7 @@
                 style="display: block; margin: 0 auto; max-width: 100px; height: auto; border-radius: 100px;">
         </div>
         <h2>Order Confirmation</h2>
-
+        <p><strong>Full Name:</strong> {{ $fullname }}</p>
         <p><strong>Reference Number:</strong> {{ $referenceNumber }}</p>
         <p><strong>Reserved Time:</strong> {{ \Carbon\Carbon::parse($reservedAt)->format('g A') }} - March 03, 2026</p>
 

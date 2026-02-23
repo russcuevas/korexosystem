@@ -13,6 +13,7 @@ class Order extends Model
         'reference_number',
         'menu_id',
         'email',
+        'fullname',
         'is_rice_menu',
         'is_add_ons_menu',
         'is_served',

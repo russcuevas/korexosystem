@@ -10,15 +10,23 @@ class OrderConfirmationMail extends Mailable
     public $reservedAt;
     public $referenceNumber;
     public $totalAmount;
-    public $qrFileName; // new property
+    public $qrFileName;
+    public $fullname; // ✅ ADD THIS
 
-    public function __construct($orders, $reservedAt, $referenceNumber, $totalAmount, $qrFileName = null)
-    {
+    public function __construct(
+        $orders,
+        $reservedAt,
+        $referenceNumber,
+        $totalAmount,
+        $qrFileName = null,
+        $fullname = null // ✅ ADD THIS
+    ) {
         $this->orders = $orders;
         $this->reservedAt = $reservedAt;
         $this->referenceNumber = $referenceNumber;
         $this->totalAmount = $totalAmount;
         $this->qrFileName = $qrFileName;
+        $this->fullname = $fullname; // ✅ ASSIGN
     }
 
     public function build()
