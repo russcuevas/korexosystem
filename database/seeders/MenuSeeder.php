@@ -16,7 +16,7 @@ class MenuSeeder extends Seeder
             // appetizers
             [
                 'category_id' => 1,
-                'menu_pic' => null,
+                'menu_pic' => "que.png",
                 'menu_name' => 'Kimchi Chicken Quezadilla',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -38,7 +38,7 @@ class MenuSeeder extends Seeder
             ],
             [
                 'category_id' => 1,
-                'menu_pic' => null,
+                'menu_pic' => "cajun.png",
                 'menu_name' => 'Cajun Corn Elote',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -58,7 +58,7 @@ class MenuSeeder extends Seeder
             // soup
             [
                 'category_id' => 2,
-                'menu_pic' => null,
+                'menu_pic' => "tofu-stew.png",
                 'menu_name' => 'Tofu Stew',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -82,7 +82,7 @@ class MenuSeeder extends Seeder
             ],
             [
                 'category_id' => 2,
-                'menu_pic' => null,
+                'menu_pic' => "chicken-torilla.png",
                 'menu_name' => 'Chicken Tortilla Soup',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -155,7 +155,7 @@ class MenuSeeder extends Seeder
             // sides
             [
                 'category_id' => 4,
-                'menu_pic' => null,
+                'menu_pic' => "marble.png",
                 'menu_name' => 'Potato Marble',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -164,7 +164,7 @@ class MenuSeeder extends Seeder
             //dessert
             [
                 'category_id' => 5,
-                'menu_pic' => null,
+                'menu_pic' => "dessert.png",
                 'menu_name' => 'Watermelon Bingsu with Cheesecake',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -252,7 +252,7 @@ class MenuSeeder extends Seeder
             // add-ons
             [
                 'category_id' => 7,
-                'menu_pic' => null,
+                'menu_pic' => "ice-tea.png",
                 'menu_name' => 'Koretea [Juice]',
                 'menu_price' => 0.00,
                 'stock_number' => 250,
@@ -261,25 +261,25 @@ class MenuSeeder extends Seeder
 
             [
                 'category_id' => 7,
-                'menu_pic' => null,
+                'menu_pic' => "spa.png",
                 'menu_name' => 'Spanish Latte',
-                'menu_price' => 100.00,
+                'menu_price' => 0.00,
                 'stock_number' => 250,
                 'is_add_ons_menu' => true,
             ],
             [
                 'category_id' => 7,
-                'menu_pic' => null,
+                'menu_pic' => "ame.png",
                 'menu_name' => 'Americano',
-                'menu_price' => 100.00,
+                'menu_price' => 0.00,
                 'stock_number' => 250,
                 'is_add_ons_menu' => true,
             ],
             [
                 'category_id' => 7,
-                'menu_pic' => null,
-                'menu_name' => 'Cappucino',
-                'menu_price' => 100.00,
+                'menu_pic' => "capu.png",
+                'menu_name' => 'Cappuccino',
+                'menu_price' => 0.00,
                 'stock_number' => 250,
                 'is_add_ons_menu' => true,
             ],

@@ -17,15 +17,12 @@ return new class extends Migration
 
             // The main menu item
             $table->unsignedBigInteger('menu_id');
-
             $table->foreign('menu_id')->references('id')->on('menus')->onDelete('cascade');
-            // Optional related menus (rice or add-ons)
             $table->unsignedBigInteger('is_rice_menu')->nullable();
             $table->foreign('is_rice_menu')->references('id')->on('menus')->onDelete('set null');
-
             $table->unsignedBigInteger('is_add_ons_menu')->nullable();
             $table->foreign('is_add_ons_menu')->references('id')->on('menus')->onDelete('set null');
-
+            $table->string('size')->nullable();
             $table->integer('quantity')->default(1);
             $table->decimal('price', 8, 2)->default(0.00);
 

@@ -13,7 +13,7 @@ class CartCountsController extends Controller
 
         if (session('verified_reference')) {
             $ref = session('reference_number');
-            $cartCount = \App\Models\Carts::where('reference_number', $ref)->sum('quantity');
+            $cartCount = \App\Models\Carts::where('reference_number', $ref)->count();
         }
 
         return response()->json(['count' => $cartCount]);

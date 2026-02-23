@@ -343,6 +343,10 @@
                                         @if ($addon->rice_name)
                                             <br>x {{ $addon->rice_name }}
                                         @endif
+                                        {{-- Display size if add-on --}}
+                                        @if ($addon->size)
+                                            <br><small style="color:#ccc;">{{ $addon->size }}</small>
+                                        @endif
                                     </h6>
 
                                     <!-- Quantity + Price + Total -->
@@ -371,7 +375,7 @@
                 <div class="col-12 mt-3">
                     @php
                         $totalAmount = $cartItems->sum(function ($i) {
-                            return $i->quantity * $i->menu_price;
+                            return $i->quantity * $i->price;
                         });
                     @endphp
                     <div class="food-card d-flex justify-content-between align-items-center">

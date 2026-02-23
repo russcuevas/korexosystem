@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreign('is_rice_menu')->references('id')->on('menus')->onDelete('set null');
             $table->unsignedBigInteger('is_add_ons_menu')->nullable();
             $table->foreign('is_add_ons_menu')->references('id')->on('menus')->onDelete('set null');
+            $table->string('size')->nullable();
             $table->boolean('is_served')->default(false);
             $table->integer('quantity')->default(1);
             $table->decimal('price', 8, 2)->default(0.00);

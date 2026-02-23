@@ -126,6 +126,7 @@ class CheckoutController extends Controller
                     'menu_id'          => $item->menu_id,
                     'is_rice_menu'     => $item->is_rice_menu,
                     'is_add_ons_menu'  => $item->is_add_ons_menu,
+                    'size'             => $item->size, // <-- added size here
                     'quantity'         => $item->quantity,
                     'price'            => $item->price,
                     'status'           => 'Placed order',

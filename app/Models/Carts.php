@@ -14,6 +14,7 @@ class Carts extends Model
         'menu_id',
         'is_rice_menu',
         'is_add_ons_menu',
+        'size',
         'quantity',
         'price',
     ];

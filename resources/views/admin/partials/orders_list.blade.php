@@ -56,7 +56,8 @@
                                     @if ($addon->rice_name)
                                         <br>w/ {{ $addon->rice_name }}
                                     @endif
-                                    [Add-on - <span
+                                    <br>
+                                    {{ $addon->size }} [Add-on - <span
                                         style="color:red; font-weight:bold;">₱{{ number_format($addon->price, 2) }}</span>]
                                 </div>
                             @endforeach

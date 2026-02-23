@@ -311,17 +311,27 @@
         @php
             use Illuminate\Support\Facades\DB;
 
-            // Get the current reference number (adjust as needed)
-            $referenceNumber = session('reference_number') ?? null;
+            // Get the current reference number
+            $referenceNumber = session('reference_number');
 
-            // Get all category_ids already added to cart for this reference number
+            // Initialize cart categories and add-ons
             $cartCategories = [];
+            $cartAddOns = [];
 
             if ($referenceNumber) {
+                // Categories of items in cart
                 $cartCategories = DB::table('carts')
                     ->join('menus', 'carts.menu_id', '=', 'menus.id')
                     ->where('carts.reference_number', $referenceNumber)
                     ->pluck('menus.category_id')
+                    ->toArray();
+
+                // Add-ons in cart (just the names)
+                $cartAddOns = DB::table('carts')
+                    ->join('menus', 'carts.menu_id', '=', 'menus.id')
+                    ->where('carts.reference_number', $referenceNumber)
+                    ->where('menus.menu_name', 'Koretea [Juice]')
+                    ->pluck('menus.menu_name')
                     ->toArray();
             }
         @endphp
@@ -329,8 +339,11 @@
         <div class="row g-3">
             @foreach ($menus as $menu)
                 @php
-                    // Check if this menu's category is already in cart
+                    // Disable if main menu already in cart (category-based)
                     $disableAdd = in_array($menu->category_id, $cartCategories ?? []);
+
+                    // Only disable Koretea [Juice] if it already exists
+                    $disableKoretea = $menu->menu_name === 'Koretea [Juice]' && count($cartAddOns) > 0;
                 @endphp
 
                 <div class="col-6 col-md-4">
@@ -346,7 +359,8 @@
                         <div class="food-img-bg">
                             @if ($menu->menu_pic)
                                 <img src="{{ asset('menus/' . $menu->menu_pic) }}" class="food-thumb"
-                                    alt="{{ $menu->menu_name }}">
+                                    alt="{{ $menu->menu_name }}"
+                                    style="width:200px; height:80px; object-fit:cover; border-radius:10px;">
                             @else
                                 <img src="https://cdn-icons-png.flaticon.com/128/1046/1046784.png" class="food-thumb"
                                     alt="No Image">
@@ -365,7 +379,11 @@
 
                         <!-- Price -->
                         <div class="price-tag">
-                            @if ($menu->is_add_ons_menu)
+                            @php
+                                $autoAddMenus = ['Koretea [Juice]'];
+                            @endphp
+
+                            @if (in_array($menu->menu_name, $autoAddMenus))
                                 ₱{{ number_format($menu->menu_price, 2) }}
                             @endif
                         </div>
@@ -373,35 +391,58 @@
                         <!-- Add Button -->
                         <!-- Add Button -->
                         @if ($menu->category_name === 'Main')
-                            {{-- Show Rice selection modal --}}
                             <button type="button" class="add-btn" data-bs-toggle="modal"
                                 data-bs-target="#riceSelectionModal{{ $menu->menu_id }}"
-                                @if ($disableAdd) disabled style="cursor: not-allowed; background-color: #ccc;" @endif>
+                                @if ($disableAdd) disabled style="cursor:not-allowed;background:#ccc;" @endif>
                                 @if ($disableAdd)
                                     🚫
                                 @else
                                     + Add
                                 @endif
                             </button>
-                        @else
-                            {{-- Regular add to cart --}}
-                            @if ($disableAdd)
-                                <button class="add-btn" disabled style="cursor: not-allowed; background-color: #ccc;">
-                                    🚫
-                                </button>
-                            @else
-                                <form action="{{ route('cart.add') }}" method="POST" class="mt-2">
+                        @elseif ($menu->is_add_ons_menu)
+                            @php
+                                $autoAddMenus = ['Koretea [Juice]'];
+                                $skipModal = in_array($menu->menu_name, $autoAddMenus);
+                            @endphp
+
+                            @if ($skipModal)
+                                <form action="{{ route('cart.add') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="menu_id" value="{{ $menu->menu_id }}">
+                                    <input type="hidden" name="is_add_ons_menu" value="{{ $menu->menu_id }}">
                                     <input type="hidden" name="is_rice_menu" value="">
-                                    <input type="hidden" name="is_add_ons_menu"
-                                        value="{{ $menu->is_add_ons_menu ? $menu->menu_id : '' }}">
+                                    <input type="hidden" name="drink_size" value="auto|0">
                                     <button type="submit" class="add-btn"
-                                        {{ strtolower($menu->status) !== 'available' || $menu->stock_number <= 0 ? 'disabled' : '' }}>
-                                        + Add
+                                        @if ($disableKoretea) disabled style="cursor:not-allowed;background:#ccc;" @endif>
+                                        @if ($disableKoretea)
+                                            🚫
+                                        @else
+                                            + Add
+                                        @endif
                                     </button>
                                 </form>
+                            @else
+                                <button type="button" class="add-btn" data-bs-toggle="modal"
+                                    data-bs-target="#drinkSizeModal{{ $menu->menu_id }}">
+                                    + Add ons
+                                </button>
                             @endif
+                        @else
+                            <form action="{{ route('cart.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="menu_id" value="{{ $menu->menu_id }}">
+                                <input type="hidden" name="is_rice_menu" value="">
+                                <input type="hidden" name="is_add_ons_menu" value="">
+                                <button type="submit" class="add-btn"
+                                    @if ($disableAdd) disabled style="cursor:not-allowed;background:#ccc;" @endif>
+                                    @if ($disableAdd)
+                                        🚫
+                                    @else
+                                        + Add
+                                    @endif
+                                </button>
+                            </form>
                         @endif
 
                         <!-- Optional Stock / Status -->
@@ -411,6 +452,70 @@
 
                     </div>
                 </div>
+
+                @if ($menu->is_add_ons_menu)
+                    <div class="modal fade" id="drinkSizeModal{{ $menu->menu_id }}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content bg-dark text-white p-3">
+
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title">
+                                        Choose Size for <br> {{ $menu->menu_name }}
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <form action="{{ route('cart.add') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="menu_id" value="{{ $menu->menu_id }}">
+                                        <input type="hidden" name="is_add_ons_menu" value="{{ $menu->menu_id }}">
+                                        <input type="hidden" name="is_rice_menu" value="">
+
+                                        @php
+                                            $sizes = [];
+
+                                            if ($menu->menu_name == 'Spanish Latte') {
+                                                $sizes = [
+                                                    ['size' => 'HOT 12oz', 'price' => 70],
+                                                    ['size' => 'COLD 16oz', 'price' => 80],
+                                                ];
+                                            }
+
+                                            if ($menu->menu_name == 'Americano') {
+                                                $sizes = [
+                                                    ['size' => 'HOT 12oz', 'price' => 60],
+                                                    ['size' => 'COLD 16oz', 'price' => 70],
+                                                ];
+                                            }
+
+                                            if ($menu->menu_name == 'Cappuccino') {
+                                                $sizes = [
+                                                    ['size' => 'HOT 12oz', 'price' => 70],
+                                                    ['size' => 'COLD 16oz', 'price' => 80],
+                                                ];
+                                            }
+                                        @endphp
+
+                                        <div class="d-grid gap-3">
+                                            @foreach ($sizes as $option)
+                                                <button type="submit" name="drink_size"
+                                                    value="{{ $option['size'] }}|{{ $option['price'] }}"
+                                                    class="btn btn-outline-light">
+                                                    {{ $option['size'] }} - ₱{{ $option['price'] }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Rice Selection Modal -->
                 <div class="modal fade food-info-modal" id="riceSelectionModal{{ $menu->menu_id }}" tabindex="-1">

@@ -16,6 +16,7 @@ class Order extends Model
         'fullname',
         'is_rice_menu',
         'is_add_ons_menu',
+        'size',
         'is_served',
         'quantity',
         'price',
