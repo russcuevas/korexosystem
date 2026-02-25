@@ -179,6 +179,10 @@
                                             REF #{{ $order['reference_number'] }}
                                             <br>
                                             <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
+                                                {{ $order['fullname'] }}
+                                            </span>
+                                            <br>
+                                            <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
                                                 {{ \Carbon\Carbon::parse($order['items']->first()->reserved_at)->format('h A') }}
                                             </span>
                                         </span>
@@ -281,11 +285,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
+        let isSearching = false;
         // ---------------- Search REF # ----------------
         let timeout = null;
         document.getElementById('searchRef').addEventListener('keyup', function() {
-            clearTimeout(timeout);
+
             let query = this.value;
+
+            if (query.length > 0) {
+                isSearching = true;
+            } else {
+                isSearching = false;
+            }
+
+            clearTimeout(timeout);
+
             timeout = setTimeout(() => {
                 fetch(`{{ route('admin.orders.search') }}?q=` + query)
                     .then(response => response.text())
@@ -297,6 +311,9 @@
 
         // ---------------- Realtime Orders Fetch ----------------
         function fetchOrdersRealtime() {
+
+            if (isSearching) return; // 🚫 stop auto refresh while searching
+
             fetch("{{ route('admin.orders.fetch') }}")
                 .then(response => response.text())
                 .then(data => {

@@ -19,6 +19,10 @@
                                 REF #{{ $order['reference_number'] }}
                                 <br>
                                 <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
+                                    {{ $order['fullname'] }}
+                                </span>
+                                <br>
+                                <span style="font-weight: normal; font-size: 0.75rem; opacity: 0.7;">
                                     {{ \Carbon\Carbon::parse($order['items']->first()->reserved_at)->format('h A') }}
                                 </span>
                             </span>

@@ -34,11 +34,18 @@ class OrdersController extends Controller
                 ->where('orders.reference_number', $ref)
                 ->get();
 
-            $status = $items->first()->status ?? 'Placed order';
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            $firstItem = $items->first();
 
             $orders[] = [
                 'reference_number' => $ref,
-                'status' => $status,
+                'status' => $firstItem->status ?? 'Placed order',
+                'fullname' => $firstItem->fullname ?? 'N/A',
+                'email' => $firstItem->email ?? 'N/A',
+                'reserved_at' => $firstItem->reserved_at ?? null,
                 'items' => $items,
             ];
         }
@@ -70,11 +77,18 @@ class OrdersController extends Controller
                 ->where('orders.reference_number', $ref)
                 ->get();
 
-            $status = $items->first()->status ?? 'Placed order';
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            $firstItem = $items->first();
 
             $orders[] = [
                 'reference_number' => $ref,
-                'status' => $status,
+                'status' => $firstItem->status ?? 'Placed order',
+                'fullname' => $firstItem->fullname ?? 'N/A',
+                'email' => $firstItem->email ?? 'N/A',
+                'reserved_at' => $firstItem->reserved_at ?? null,
                 'items' => $items,
             ];
         }
@@ -112,9 +126,18 @@ class OrdersController extends Controller
                 ->where('orders.reference_number', $ref)
                 ->get();
 
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            $firstItem = $items->first();
+
             $orders[] = [
                 'reference_number' => $ref,
-                'status' => $items->first()->status ?? 'Placed order',
+                'status' => $firstItem->status ?? 'Placed order',
+                'fullname' => $firstItem->fullname ?? 'N/A',
+                'email' => $firstItem->email ?? 'N/A',
+                'reserved_at' => $firstItem->reserved_at ?? null,
                 'items' => $items,
             ];
         }

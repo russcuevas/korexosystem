@@ -97,12 +97,17 @@
                 <div class="col-12 col-xl-11"
                     style="background-color: rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 1.5rem;">
 
+                    @php
+                        $usedTickets = $tickets->where('is_used', 1)->count();
+                        $notUsedTickets = $tickets->where('is_used', 0)->count();
+                    @endphp
+
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6">
                             <div class="small-box shadow-sm"
                                 style="background: #111111; border-radius: 12px; color: #fff; position: relative; overflow: hidden;">
                                 <div class="inner" style="padding: 1.5rem; text-align: center">
-                                    <h3 style="font-weight: 700;">0</h3>
+                                    <h3 style="font-weight: 700;">{{ $usedTickets }}</h3>
                                     <p style="color: #adb5bd; margin-bottom: 0; font-weight: 900;">USED</p>
                                 </div>
                             </div>
@@ -112,7 +117,7 @@
                             <div class="small-box shadow-sm"
                                 style="background: #111111; border-radius: 12px; color: #fff; position: relative; overflow: hidden;">
                                 <div class="inner" style="padding: 1.5rem; text-align: center">
-                                    <h3 style="font-weight: 700;">0</h3>
+                                    <h3 style="font-weight: 700;">{{ $notUsedTickets }}</h3>
                                     <p style="color: #adb5bd; margin-bottom: 0; font-weight: 900;">NOT USED</p>
                                 </div>
                             </div>

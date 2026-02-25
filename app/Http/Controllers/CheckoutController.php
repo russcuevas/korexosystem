@@ -146,7 +146,7 @@ class CheckoutController extends Controller
                     ->update(['status' => 'not available']);
 
                 // RICE MENU
-                if ($item->is_rice_menu) {
+                if ($item->is_rice_menu && $item->is_rice_menu != $item->menu_id) {
                     DB::table('menus')
                         ->where('id', $item->is_rice_menu)
                         ->decrement('stock_number', $item->quantity);
@@ -158,7 +158,7 @@ class CheckoutController extends Controller
                 }
 
                 // ADD-ON MENU
-                if ($item->is_add_ons_menu) {
+                if ($item->is_add_ons_menu && $item->is_add_ons_menu != $item->menu_id) {
                     DB::table('menus')
                         ->where('id', $item->is_add_ons_menu)
                         ->decrement('stock_number', $item->quantity);
