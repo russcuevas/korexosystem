@@ -4,6 +4,7 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\MenuController;
 use App\Http\Controllers\admin\OrdersController;
 use App\Http\Controllers\admin\QrController;
+use App\Http\Controllers\admin\SalesController;
 use App\Http\Controllers\admin\TicketingController;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\CartCountsController;
@@ -69,6 +70,6 @@ Route::middleware(['admin.auth'])->group(function () {
     Route::post('/admin/orders/complete-all', [OrdersController::class, 'completeAll']);
     Route::post('/admin/orders/update-status', [OrdersController::class, 'updateStatus'])->name('admin.orders.updateStatus');
     Route::get('/admin/orders/receipt/{ref}', [OrdersController::class, 'printReceipt'])->name('admin.orders.receipt');
-
+    Route::get('/admin/sales', [SalesController::class, 'SalesPage'])->name('admin.sales.page');
     Route::get('/qr-code/{referenceNumber}', [QrController::class, 'ShowQrOrder'])->name('admin.qr.show');
 });

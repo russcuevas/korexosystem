@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,58 +54,14 @@ class OrdersController extends Controller
         return view('admin.orders', compact('orders'));
     }
 
-    public function fetchOrders()
+    public function fetchOrders(Request $request)
     {
-        $referenceNumbers = DB::table('orders')
-            ->select('reference_number')
-            ->distinct()
-            ->orderBy('created_at', 'desc')
-            ->pluck('reference_number');
-
-        $orders = [];
-
-        foreach ($referenceNumbers as $ref) {
-            $items = DB::table('orders')
-                ->select(
-                    'orders.*',
-                    'menus.menu_name as menu_name',
-                    'rice.menu_name as rice_name',
-                    'addons.menu_name as addon_name'
-                )
-                ->join('menus', 'orders.menu_id', '=', 'menus.id')
-                ->leftJoin('menus as rice', 'orders.is_rice_menu', '=', 'rice.id')
-                ->leftJoin('menus as addons', 'orders.is_add_ons_menu', '=', 'addons.id')
-                ->where('orders.reference_number', $ref)
-                ->get();
-
-            if ($items->isEmpty()) {
-                continue;
-            }
-
-            $firstItem = $items->first();
-
-            $orders[] = [
-                'reference_number' => $ref,
-                'status' => $firstItem->status ?? 'Placed order',
-                'fullname' => $firstItem->fullname ?? 'N/A',
-                'email' => $firstItem->email ?? 'N/A',
-                'reserved_at' => $firstItem->reserved_at ?? null,
-                'items' => $items,
-            ];
-        }
-
-        return view('admin.partials.orders_list', compact('orders'))->render();
-    }
-
-
-    public function search(Request $request)
-    {
-        $query = $request->q;
+        $time = $request->query('time'); // e.g., "10:00:00"
 
         $referenceNumbers = DB::table('orders')
             ->select('reference_number')
-            ->when($query, function ($q2) use ($query) {
-                $q2->where('reference_number', 'like', "{$query}%");
+            ->when($time, function ($query, $time) {
+                $query->whereTime('reserved_at', $time);
             })
             ->distinct()
             ->orderBy('created_at', 'desc')
@@ -126,9 +83,54 @@ class OrdersController extends Controller
                 ->where('orders.reference_number', $ref)
                 ->get();
 
-            if ($items->isEmpty()) {
-                continue;
-            }
+            if ($items->isEmpty()) continue;
+
+            $firstItem = $items->first();
+
+            $orders[] = [
+                'reference_number' => $ref,
+                'status' => $firstItem->status ?? 'Placed order',
+                'fullname' => $firstItem->fullname ?? 'N/A',
+                'email' => $firstItem->email ?? 'N/A',
+                'reserved_at' => $firstItem->reserved_at ?? null,
+                'items' => $items,
+            ];
+        }
+
+        return view('admin.partials.orders_list', compact('orders'))->render();
+    }
+
+
+    public function search(Request $request)
+    {
+        $query = $request->q;
+        $time = $request->time; // optional time filter, e.g., '10:00', '11:00'
+
+        $referenceNumbers = DB::table('orders')
+            ->select('reference_number')
+            ->when($query, fn($q2) => $q2->where('reference_number', 'like', "{$query}%"))
+            ->when($time, fn($q3) => $q3->whereTime('reserved_at', $time))
+            ->distinct()
+            ->orderBy('created_at', 'desc')
+            ->pluck('reference_number');
+
+        $orders = [];
+
+        foreach ($referenceNumbers as $ref) {
+            $items = DB::table('orders')
+                ->select(
+                    'orders.*',
+                    'menus.menu_name as menu_name',
+                    'rice.menu_name as rice_name',
+                    'addons.menu_name as addon_name'
+                )
+                ->join('menus', 'orders.menu_id', '=', 'menus.id')
+                ->leftJoin('menus as rice', 'orders.is_rice_menu', '=', 'rice.id')
+                ->leftJoin('menus as addons', 'orders.is_add_ons_menu', '=', 'addons.id')
+                ->where('orders.reference_number', $ref)
+                ->get();
+
+            if ($items->isEmpty()) continue;
 
             $firstItem = $items->first();
 
@@ -173,7 +175,7 @@ class OrdersController extends Controller
             return response('Order not found', 404);
         }
 
-        $lineWidth = 32; // 58mm printer
+        $lineWidth = 32; // 58mm printer width approx
         $output = "";
 
         // ===== HEADER =====
@@ -186,48 +188,47 @@ class OrdersController extends Controller
 
         foreach ($items as $item) {
 
-            $name = $item->quantity . "x " . $item->menu_name;
-            $price = $item->price;
-            $total += $price;
+            // Quantity from DB
+            $qty = $item->quantity;
+            $lineTotal = $item->price * $qty;
+            $total += $lineTotal;
 
-            $priceText = "P" . number_format($price, 2);
+            $sizeText = $item->size ? " " . $item->size : "";
 
-            // Available width for name (32 - price width)
+            // MAIN ITEM
+            if (!$item->is_add_ons_menu) { // 0 or NULL
+                $name = $qty . "x " . $item->menu_name . $sizeText;
+            }
+            // ADD-ON ITEM
+            else {
+                $name = $qty . "x " . $item->menu_name . $sizeText . " [Add-on]";
+            }
+
+            $priceText = "P" . number_format($lineTotal, 2);
             $nameWidth = $lineWidth - strlen($priceText);
-
-            // Word wrap instead of cut
             $wrappedName = wordwrap($name, $nameWidth, "\n", true);
             $nameLines = explode("\n", $wrappedName);
 
             foreach ($nameLines as $index => $line) {
-
-                if ($index == 0) {
-                    // First line has price
+                if ($index === 0) {
                     $output .= str_pad($line, $nameWidth);
                     $output .= $priceText . "\n";
                 } else {
-                    // Next lines no price
                     $output .= $line . "\n";
                 }
             }
 
-            if ($item->rice_name) {
+            // Rice menu
+            if ($item->rice_name && !$item->is_add_ons_menu) {
                 $output .= "  w/ {$item->rice_name}\n";
-            }
-
-            if (!is_null($item->is_add_ons_menu)) {
-                $output .= "  [Add-on]\n";
             }
         }
 
         $output .= str_repeat("-", $lineWidth) . "\n";
-
         $totalText = "P" . number_format($total, 2);
         $output .= str_pad("TOTAL", $lineWidth - strlen($totalText));
         $output .= $totalText . "\n";
-
         $output .= str_repeat("-", $lineWidth) . "\n\n";
-
         $output .= str_pad("Thank you for your order!", $lineWidth, " ", STR_PAD_BOTH) . "\n\n\n";
 
         return response($output)->header('Content-Type', 'text/plain');
@@ -260,26 +261,56 @@ class OrdersController extends Controller
     {
         $itemId = $request->item_id;
 
-        // 1️⃣ Mark the clicked item as served
         $item = DB::table('orders')->where('id', $itemId)->first();
 
         if (!$item) {
             return response()->json(['error' => 'Item not found'], 404);
         }
 
+        // ✅ Mark item as served
         DB::table('orders')
             ->where('id', $itemId)
             ->update(['is_served' => 1]);
 
+        // ✅ Check remaining unserved items
         $remaining = DB::table('orders')
             ->where('reference_number', $item->reference_number)
             ->where('is_served', 0)
             ->count();
 
         if ($remaining == 0) {
+
+            // ✅ Update status to Served
             DB::table('orders')
                 ->where('reference_number', $item->reference_number)
                 ->update(['status' => 'Served']);
+
+            // 🔥 Get all items of this reference
+            $orders = DB::table('orders')
+                ->where('reference_number', $item->reference_number)
+                ->get();
+
+            $basePrice = 490; // fixed ticket price
+            $addonsTotal = 0;
+
+            foreach ($orders as $order) {
+                // Only count add-ons
+                if (!is_null($order->is_add_ons_menu)) {
+                    $addonsTotal += ($order->price * $order->quantity);
+                }
+            }
+
+            $finalTotal = $basePrice + $addonsTotal;
+
+            // ✅ Prevent duplicate sales record
+            $existingSale = Sales::where('reference_number', $item->reference_number)->first();
+
+            if (!$existingSale) {
+                Sales::create([
+                    'reference_number' => $item->reference_number,
+                    'total_price' => $finalTotal
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -297,15 +328,43 @@ class OrdersController extends Controller
     {
         $ref = $request->reference_number;
 
-        $updated = DB::table('orders')
+        $orders = DB::table('orders')
+            ->where('reference_number', $ref)
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        DB::table('orders')
             ->where('reference_number', $ref)
             ->update([
                 'is_served' => 1,
                 'status' => 'Served'
             ]);
 
+        $basePrice = 490;
+        $addonsTotal = 0;
+
+        foreach ($orders as $order) {
+            if (!is_null($order->is_add_ons_menu)) {
+                $addonsTotal += ($order->price * $order->quantity);
+            }
+        }
+
+        $finalTotal = $basePrice + $addonsTotal;
+        $existingSale = Sales::where('reference_number', $ref)->first();
+
+        if (!$existingSale) {
+            Sales::create([
+                'reference_number' => $ref,
+                'total_price' => $finalTotal
+            ]);
+        }
+
         return response()->json([
-            'success' => true
+            'success' => true,
+            'total' => $finalTotal
         ]);
     }
 }

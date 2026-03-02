@@ -132,6 +132,11 @@
             padding: 4px 8px;
             font-size: 0.8rem;
         }
+
+        .served-item {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
     </style>
 </head>
 
@@ -149,6 +154,17 @@
 
         <div class="d-flex flex-wrap gap-2 mb-4 justify-content-end">
             <div class="flex-grow-1 flex-sm-grow-0">
+                <select id="timeFilter" class="form-control" style="height: 41px;">
+                    <option value="">All</option>
+                    <option value="10:00:00">10 AM</option>
+                    <option value="11:00:00">11 AM</option>
+                    <option value="12:00:00">12 PM</option>
+                    <option value="13:00:00">01 PM</option>
+                    <option value="14:00:00">02 PM</option>
+                </select>
+            </div>
+
+            <div class="flex-grow-1 flex-sm-grow-0">
                 <input type="text" id="searchRef" class="form-control" placeholder="Search REF #"
                     style="height: 41px;">
             </div>
@@ -156,6 +172,7 @@
 
 
 
+        <h2 id="selectedTimeHeading" class="text-white mt-3"></h2>
 
         <div id="orderContainer">
             @php
@@ -202,7 +219,8 @@
                                     <div class="item-list">
                                         {{-- Main items --}}
                                         @foreach ($order['items']->whereNull('is_add_ons_menu') as $item)
-                                            <div class="mb-1">
+                                            <div
+                                                class="mb-1 {{ ($statusKey == 'Pending' && $item->is_served == 1) || $statusKey == 'Served' ? 'served-item' : '' }}">
                                                 {{ $item->quantity }}x {{ $item->menu_name }}
                                                 @if ($item->rice_name)
                                                     w/ {{ $item->rice_name }}
@@ -210,19 +228,24 @@
                                             </div>
                                         @endforeach
 
+
                                         {{-- Add-ons --}}
                                         @php
                                             $addOns = $order['items']->filter(fn($i) => !is_null($i->is_add_ons_menu));
                                         @endphp
                                         @foreach ($addOns as $addon)
-                                            <div class="mb-1">
+                                            <div
+                                                class="mb-1 {{ ($statusKey == 'Pending' && $addon->is_served == 1) || $statusKey == 'Served' ? 'served-item' : '' }}">
                                                 {{ $addon->quantity }}x {{ $addon->menu_name }}
                                                 @if ($addon->rice_name)
                                                     <br>w/ {{ $addon->rice_name }}
                                                 @endif
                                                 <br>
-                                                {{ $addon->size }} [Add-on - <span
-                                                    style="color:red; font-weight:bold;">₱{{ number_format($addon->price, 2) }}</span>]
+                                                {{ $addon->size }}
+                                                [Add-on -
+                                                <span style="color:red; font-weight:bold;">
+                                                    ₱{{ number_format($addon->price * $addon->quantity, 2) }}
+                                                </span>]
                                             </div>
                                         @endforeach
                                     </div>
@@ -237,6 +260,10 @@
                                             <button class="btn btn-warning btn-action fw-bold text-dark"
                                                 onclick="openServeModal('{{ $order['reference_number'] }}')">
                                                 SERVED
+                                            </button>
+                                            <button class="btn btn-secondary btn-action fw-bold"
+                                                onclick="reprintReceipt('{{ $order['reference_number'] }}')">
+                                                REPRINT RECEIPT
                                             </button>
                                         @else
                                         @endif
@@ -286,41 +313,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         let isSearching = false;
-        // ---------------- Search REF # ----------------
+        let selectedTime = null; // declare globally
         let timeout = null;
+
+        // Reference to the heading that shows selected time
+        const selectedTimeHeading = document.getElementById('selectedTimeHeading');
+
+        // ---------------- Search REF # ----------------
         document.getElementById('searchRef').addEventListener('keyup', function() {
-
             let query = this.value;
-
-            if (query.length > 0) {
-                isSearching = true;
-            } else {
-                isSearching = false;
-            }
+            isSearching = query.length > 0;
 
             clearTimeout(timeout);
-
             timeout = setTimeout(() => {
-                fetch(`{{ route('admin.orders.search') }}?q=` + query)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById('orderContainer').innerHTML = data;
-                    });
+                fetchOrders(query, selectedTime);
             }, 300);
         });
 
-        // ---------------- Realtime Orders Fetch ----------------
-        function fetchOrdersRealtime() {
+        // ---------------- Time Filter ----------------
+        document.getElementById('timeFilter').addEventListener('change', function() {
+            selectedTime = this.value || null;
 
-            if (isSearching) return; // 🚫 stop auto refresh while searching
+            // Update heading text
+            let selectedText = this.options[this.selectedIndex].text;
+            selectedTimeHeading.textContent = (selectedText === "All") ? "" : "Showing orders for: " + selectedText;
 
-            fetch("{{ route('admin.orders.fetch') }}")
-                .then(response => response.text())
+            // Fetch orders with new time
+            fetchOrders(document.getElementById('searchRef').value, selectedTime);
+        });
+
+        // ---------------- Fetch Orders ----------------
+        function fetchOrders(query = '', time = null) {
+            let url = `{{ route('admin.orders.search') }}?q=${query}`;
+            if (time) url += `&time=${time}`;
+
+            fetch(url)
+                .then(res => res.text())
                 .then(data => {
                     document.getElementById('orderContainer').innerHTML = data;
                 })
-                .catch(error => console.log(error));
+                .catch(err => console.error('Fetch orders error:', err));
         }
+
+        // ---------------- Auto Refresh ----------------
+        function fetchOrdersRealtime() {
+            if (isSearching) return; // pause auto-refresh while searching
+            fetchOrders('', selectedTime);
+        }
+
         setInterval(fetchOrdersRealtime, 5000);
 
         // ---------------- Sidebar Toggle ----------------
@@ -469,6 +509,28 @@
             }
         }
 
+        async function reprintReceipt(referenceNumber) {
+            try {
+                // 1️⃣ Fetch receipt from Laravel
+                const receiptResponse = await fetch(
+                    '{{ url('/admin/orders/receipt') }}/' + referenceNumber
+                );
+
+                if (!receiptResponse.ok) {
+                    throw new Error("Failed to fetch receipt");
+                }
+
+                const receiptText = await receiptResponse.text();
+
+                // 2️⃣ Print 2 copies again
+                await printTwoCopies(receiptText);
+
+            } catch (err) {
+                console.error("Reprint error:", err);
+                alert("Reprint Error: " + err.message);
+            }
+        }
+
         let currentReference = null;
 
         function openServeModal(referenceNumber) {
@@ -486,13 +548,19 @@
 
                         let servedClass = item.is_served == 1 ? 'served' : '';
 
+                        // Build item display
+                        let sizeText = item.size ? ` ${item.size}` : '';
+                        let riceText = item.rice_name && !item.is_add_ons_menu ?
+                            `<br><small>w/ ${item.rice_name}</small>` : '';
+
+                        let addOnText = item.is_add_ons_menu ? ' [Add-on]' : '';
+
                         html += `
                     <div class="item-row ${servedClass}" id="item-${item.id}">
                         <div>
-                            ${item.quantity}x ${item.menu_name}
+                            ${item.quantity}x ${item.menu_name}${sizeText}${addOnText}${riceText}
                         </div>
-                        <button class="check-btn"
-                            onclick="markItemServed(${item.id})">
+                        <button class="check-btn" onclick="markItemServed(${item.id})">
                             ✔
                         </button>
                     </div>
@@ -559,14 +627,10 @@
                     .then(data => {
 
                         if (data.success) {
-
-                            // Highlight all items in modal
                             document.querySelectorAll('.item-row')
                                 .forEach(row => row.classList.add('served'));
 
                             toastr.success("Order Completed!", "Success");
-
-                            // Close modal after small delay
                             setTimeout(() => {
                                 bootstrap.Modal.getInstance(
                                     document.getElementById('serveModal')
@@ -579,15 +643,6 @@
 
             });
 
-        // ---------------- Sort Dropdown ----------------
-        function updateSortText(text) {
-            const btn = document.querySelector('#sortDropdown span');
-            btn.textContent = text;
-
-            const items = document.querySelectorAll('#sortDropdown + .dropdown-menu .dropdown-item');
-            items.forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
-        }
 
         // ---------------- Status Dropdown ----------------
         function updateStatusText(text) {
@@ -598,6 +653,24 @@
             items.forEach(item => item.classList.remove('active'));
             event.target.classList.add('active');
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchRef');
+            const lastRef = sessionStorage.getItem('lastPrintedRef');
+
+            if (lastRef) {
+                searchInput.value = lastRef;
+
+                // Optionally trigger search automatically
+                const event = new Event('keyup');
+                searchInput.dispatchEvent(event);
+
+                // Clear it after using once
+                sessionStorage.removeItem('lastPrintedRef');
+            }
+        });
     </script>
 </body>
 

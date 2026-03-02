@@ -42,7 +42,8 @@
                         <div class="item-list">
                             {{-- Main items --}}
                             @foreach ($order['items']->whereNull('is_add_ons_menu') as $item)
-                                <div class="mb-1">
+                                <div
+                                    class="mb-1 {{ ($statusKey == 'Pending' && $item->is_served == 1) || $statusKey == 'Served' ? 'served-item' : '' }}">
                                     {{ $item->quantity }}x {{ $item->menu_name }}
                                     @if ($item->rice_name)
                                         w/ {{ $item->rice_name }}
@@ -50,19 +51,24 @@
                                 </div>
                             @endforeach
 
+
                             {{-- Add-ons --}}
                             @php
                                 $addOns = $order['items']->filter(fn($i) => !is_null($i->is_add_ons_menu));
                             @endphp
                             @foreach ($addOns as $addon)
-                                <div class="mb-1">
+                                <div
+                                    class="mb-1 {{ ($statusKey == 'Pending' && $addon->is_served == 1) || $statusKey == 'Served' ? 'served-item' : '' }}">
                                     {{ $addon->quantity }}x {{ $addon->menu_name }}
                                     @if ($addon->rice_name)
                                         <br>w/ {{ $addon->rice_name }}
                                     @endif
                                     <br>
-                                    {{ $addon->size }} [Add-on - <span
-                                        style="color:red; font-weight:bold;">₱{{ number_format($addon->price, 2) }}</span>]
+                                    {{ $addon->size }}
+                                    [Add-on -
+                                    <span style="color:red; font-weight:bold;">
+                                        ₱{{ number_format($addon->price * $addon->quantity, 2) }}
+                                    </span>]
                                 </div>
                             @endforeach
                         </div>
@@ -77,6 +83,10 @@
                                 <button class="btn btn-warning btn-action fw-bold text-dark"
                                     onclick="openServeModal('{{ $order['reference_number'] }}')">
                                     SERVED
+                                </button>
+                                <button class="btn btn-secondary btn-action fw-bold"
+                                    onclick="reprintReceipt('{{ $order['reference_number'] }}')">
+                                    REPRINT RECEIPT
                                 </button>
                             @else
                             @endif

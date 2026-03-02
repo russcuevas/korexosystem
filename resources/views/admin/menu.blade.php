@@ -117,13 +117,60 @@
                                         <td class="px-3 fw-bold" style="color: #f3f3f3;">
                                             {{ $menu->category_name }}
 
-                                        <td class="px-3 fw-bold" style="color: #f3f3f3;">{{ $menu->menu_name }}
+                                        <td class="px-3 fw-bold" style="color: #f3f3f3;">
+                                            <div class="d-flex align-items-center gap-3">
+
+                                                @if ($menu->menu_pic)
+                                                    <img src="{{ asset('menus/' . $menu->menu_pic) }}"
+                                                        alt="{{ $menu->menu_name }}"
+                                                        style="width:50px; height:50px; object-fit:cover; border-radius:10px;">
+                                                @else
+                                                    <img src="{{ asset('menus/default.png') }}" alt="No Image"
+                                                        style="width:50px; height:50px; object-fit:cover; border-radius:10px;">
+                                                @endif
+
+                                                <span>{{ $menu->menu_name }}</span>
+                                            </div>
                                         </td>
                                         <td class="px-3 fw-bold" style="color: #f3f3f3">
-                                            @if ($menu->menu_price == 0)
-                                                FREE
+                                            @php
+                                                $sizes = [];
+
+                                                if ($menu->menu_name == 'Spanish Latte') {
+                                                    $sizes = [
+                                                        ['size' => 'HOT 12oz', 'price' => 70],
+                                                        ['size' => 'COLD 16oz', 'price' => 80],
+                                                    ];
+                                                }
+
+                                                if ($menu->menu_name == 'Americano') {
+                                                    $sizes = [
+                                                        ['size' => 'HOT 12oz', 'price' => 60],
+                                                        ['size' => 'COLD 16oz', 'price' => 70],
+                                                    ];
+                                                }
+
+                                                if ($menu->menu_name == 'Cappuccino') {
+                                                    $sizes = [
+                                                        ['size' => 'HOT 12oz', 'price' => 70],
+                                                        ['size' => 'COLD 16oz', 'price' => 80],
+                                                    ];
+                                                }
+                                            @endphp
+
+                                            @if (count($sizes) > 0)
+                                                @foreach ($sizes as $index => $item)
+                                                    {{ $item['size'] }} - ₱{{ number_format($item['price'], 2) }}
+                                                    @if (!$loop->last)
+                                                        <br>
+                                                    @endif
+                                                @endforeach
                                             @else
-                                                ₱{{ number_format($menu->menu_price, 2) }}
+                                                @if ($menu->menu_price == 0)
+                                                    FREE
+                                                @else
+                                                    ₱{{ number_format($menu->menu_price, 2) }}
+                                                @endif
                                             @endif
                                         </td>
                                         <td>

@@ -8,14 +8,30 @@
     </div>
 
     <nav>
-        <a href="{{ route('admin.dashboard.page') }}" class="nav-link-admin active"><i class="bi bi-grid-1x2-fill"></i>
-            Dashboard</a>
-        <a href="{{ route('admin.ticketing.page') }} " class="nav-link-admin"><i
-                class="bi bi-ticket-perforated-fill"></i>
-            Tickets</a>
-        <a href="{{ route('admin.menu.page') }} " class="nav-link-admin"><i class="bi bi-egg-fried"></i> Menu</a>
-        <a href="{{ route('admin.orders.page') }}" class="nav-link-admin"><i class="bi bi-cart-check"></i> Orders</a>
-        <a href="#" class="nav-link-admin"><i class="bi bi-graph-up"></i> Sales</a>
+        <a href="{{ route('admin.dashboard.page') }}"
+            class="nav-link-admin {{ Route::is('admin.dashboard.page') ? 'active' : '' }}">
+            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+
+        <a href="{{ route('admin.ticketing.page') }}"
+            class="nav-link-admin {{ Route::is('admin.ticketing.page') ? 'active' : '' }}">
+            <i class="bi bi-ticket-perforated-fill"></i> Tickets
+        </a>
+
+        <a href="{{ route('admin.menu.page') }}"
+            class="nav-link-admin {{ Route::is('admin.menu.page') ? 'active' : '' }}">
+            <i class="bi bi-egg-fried"></i> Menu
+        </a>
+
+        <a href="{{ route('admin.orders.page') }}"
+            class="nav-link-admin {{ Route::is('admin.orders.page') ? 'active' : '' }}">
+            <i class="bi bi-cart-check"></i> Orders
+        </a>
+
+        <a href="{{ route('admin.sales.page') }}"
+            class="nav-link-admin {{ Route::is('admin.sales.page') ? 'active' : '' }}">
+            <i class="bi bi-graph-up"></i> Sales
+        </a>
         <div class="mt-5 pt-5">
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
